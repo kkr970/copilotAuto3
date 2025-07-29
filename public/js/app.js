@@ -5,11 +5,18 @@ class TRPGApp {
         this.character = {
             name: '',
             class: '',
-            stats: {}
+            stats: {},
+            level: 1,
+            experience: 0,
+            maxHp: 20,
+            currentHp: 20
         };
+        this.currentMonster = null;
+        this.inCombat = false;
         this.gameLog = [];
         this.initEventListeners();
         this.addLogEntry('게임에 오신 것을 환영합니다!');
+        this.updateCharacterDisplay();
     }
 
     initEventListeners() {
@@ -39,11 +46,43 @@ class TRPGApp {
         // 캐릭터 정보 업데이트
         document.getElementById('character-name').addEventListener('input', (e) => {
             this.character.name = e.target.value;
+            this.updateCharacterDisplay();
         });
 
         document.getElementById('character-class').addEventListener('change', (e) => {
             this.character.class = e.target.value;
+            this.updateCharacterDisplay();
             this.addLogEntry(`직업을 ${e.target.value}(으)로 선택했습니다.`);
+        });
+
+        // 모험 이벤트
+        document.getElementById('start-encounter').addEventListener('click', () => {
+            this.startEncounter();
+        });
+
+        document.getElementById('rest-character').addEventListener('click', () => {
+            this.restCharacter();
+        });
+
+        document.getElementById('explore-dungeon').addEventListener('click', () => {
+            this.exploreDungeon();
+        });
+
+        // 전투 이벤트
+        document.getElementById('attack-btn').addEventListener('click', () => {
+            this.performCombatAction('attack');
+        });
+
+        document.getElementById('defend-btn').addEventListener('click', () => {
+            this.performCombatAction('defend');
+        });
+
+        document.getElementById('skill-btn').addEventListener('click', () => {
+            this.performCombatAction('skill');
+        });
+
+        document.getElementById('flee-btn').addEventListener('click', () => {
+            this.performCombatAction('flee');
         });
     }
 
@@ -61,7 +100,14 @@ class TRPGApp {
 
             const stats = await response.json();
             this.character.stats = stats;
+            
+            // HP 계산 (체력 수정자 + 기본 HP)
+            const constitutionMod = this.getModifier(stats.체력);
+            this.character.maxHp = 20 + (constitutionMod * 2);
+            this.character.currentHp = this.character.maxHp;
+            
             this.displayCharacterStats(stats);
+            this.updateCharacterDisplay();
             
             this.addLogEntry(`${characterName} (${characterClass})의 능력치가 생성되었습니다!`);
             
@@ -77,9 +123,17 @@ class TRPGApp {
     displayCharacterStats(stats) {
         Object.entries(stats).forEach(([statName, value]) => {
             const element = document.getElementById(`stat-${statName}`);
+            const modElement = document.getElementById(`mod-${statName}`);
+            
             if (element) {
                 element.textContent = value;
                 element.parentElement.className = 'stat';
+                
+                // 수정자 계산 및 표시
+                if (modElement) {
+                    const modifier = this.getModifier(value);
+                    modElement.textContent = `(${modifier >= 0 ? '+' : ''}${modifier})`;
+                }
                 
                 // 능력치에 따른 색상 변경
                 if (value >= 16) {
@@ -269,6 +323,315 @@ class TRPGApp {
         this.gameLog = [];
         this.updateLogDisplay();
         this.addLogEntry('게임 로그가 지워졌습니다.');
+    }
+
+    // 능력치 수정자 계산 (D&D 방식)
+    getModifier(statValue) {
+        return Math.floor((statValue - 10) / 2);
+    }
+
+    // 캐릭터 표시 업데이트
+    updateCharacterDisplay() {
+        const nameElement = document.getElementById('character-display-name');
+        const iconElement = document.getElementById('character-icon');
+        const levelElement = document.getElementById('character-level');
+        const expElement = document.getElementById('character-exp');
+        const hpFillElement = document.getElementById('hp-fill');
+        const hpTextElement = document.getElementById('hp-text');
+
+        // 이름 표시
+        const displayName = this.character.name || '새로운 모험가';
+        if (nameElement) nameElement.textContent = displayName;
+
+        // 직업별 아이콘
+        const classIcons = {
+            '전사': '⚔️',
+            '마법사': '🧙‍♂️',
+            '도적': '🗡️',
+            '성직자': '⛪',
+            '궁수': '🏹'
+        };
+        if (iconElement) {
+            iconElement.textContent = classIcons[this.character.class] || '🧑‍💼';
+        }
+
+        // 레벨과 경험치
+        if (levelElement) levelElement.textContent = this.character.level;
+        if (expElement) expElement.textContent = this.character.experience;
+
+        // HP 바
+        if (hpFillElement && hpTextElement) {
+            const hpPercentage = (this.character.currentHp / this.character.maxHp) * 100;
+            hpFillElement.style.width = `${hpPercentage}%`;
+            hpTextElement.textContent = `${this.character.currentHp}/${this.character.maxHp}`;
+            
+            // HP에 따른 색상 변경
+            if (hpPercentage <= 25) {
+                hpFillElement.style.background = 'linear-gradient(90deg, #f56565, #e53e3e)';
+            } else if (hpPercentage <= 50) {
+                hpFillElement.style.background = 'linear-gradient(90deg, #ed8936, #dd6b20)';
+            } else {
+                hpFillElement.style.background = 'linear-gradient(90deg, #48bb78, #68d391)';
+            }
+        }
+    }
+
+    // 몬스터 조우 시작
+    async startEncounter() {
+        if (this.inCombat) {
+            this.addLogEntry('이미 전투 중입니다!');
+            return;
+        }
+
+        if (!this.character.stats.힘) {
+            this.addLogEntry('먼저 캐릭터를 생성해주세요!');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/encounter');
+            const monster = await response.json();
+            
+            this.currentMonster = monster;
+            this.inCombat = true;
+            
+            this.addLogEntry(`🐺 야생의 ${monster.name}이(가) 나타났다!`);
+            this.showCombatScreen();
+            
+        } catch (error) {
+            console.error('몬스터 조우 오류:', error);
+            this.addLogEntry('몬스터를 찾을 수 없습니다.');
+        }
+    }
+
+    // 전투 화면 표시
+    showCombatScreen() {
+        const combatArea = document.getElementById('combat-area');
+        const playerIcon = document.getElementById('player-combat-icon');
+        const playerName = document.getElementById('player-combat-name');
+        const monsterIcon = document.getElementById('monster-icon');
+        const monsterName = document.getElementById('monster-name');
+
+        combatArea.classList.remove('hidden');
+
+        // 플레이어 정보 설정
+        const classIcons = {
+            '전사': '⚔️',
+            '마법사': '🧙‍♂️',
+            '도적': '🗡️',
+            '성직자': '⛪',
+            '궁수': '🏹'
+        };
+        
+        playerIcon.textContent = classIcons[this.character.class] || '🧑‍💼';
+        playerName.textContent = this.character.name || '모험가';
+
+        // 몬스터 정보 설정
+        monsterIcon.textContent = this.currentMonster.image;
+        monsterName.textContent = this.currentMonster.name;
+
+        this.updateCombatHP();
+        this.clearCombatMessages();
+    }
+
+    // 전투 HP 업데이트
+    updateCombatHP() {
+        // 플레이어 HP
+        const playerHpFill = document.getElementById('player-combat-hp');
+        const playerHpText = document.getElementById('player-combat-hp-text');
+        const playerHpPercentage = (this.character.currentHp / this.character.maxHp) * 100;
+        
+        playerHpFill.style.width = `${playerHpPercentage}%`;
+        playerHpText.textContent = `${this.character.currentHp}/${this.character.maxHp}`;
+
+        // 몬스터 HP
+        const monsterHpFill = document.getElementById('monster-hp');
+        const monsterHpText = document.getElementById('monster-hp-text');
+        const monsterHpPercentage = (this.currentMonster.hp / this.currentMonster.maxHp) * 100;
+        
+        monsterHpFill.style.width = `${monsterHpPercentage}%`;
+        monsterHpText.textContent = `${this.currentMonster.hp}/${this.currentMonster.maxHp}`;
+    }
+
+    // 전투 액션 수행
+    async performCombatAction(action) {
+        if (!this.inCombat || !this.currentMonster) {
+            return;
+        }
+
+        if (action === 'flee') {
+            this.fleeCombat();
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/combat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action,
+                    playerStats: this.character.stats,
+                    monsterStats: this.currentMonster,
+                    playerHp: this.character.currentHp,
+                    monsterHp: this.currentMonster.hp
+                })
+            });
+
+            const result = await response.json();
+            this.processCombatResult(result);
+
+        } catch (error) {
+            console.error('전투 처리 오류:', error);
+            this.addCombatMessage('전투 처리 중 오류가 발생했습니다.');
+        }
+    }
+
+    // 전투 결과 처리
+    processCombatResult(result) {
+        // HP 업데이트
+        this.character.currentHp = result.playerHp;
+        this.currentMonster.hp = result.monsterHp;
+
+        // 메시지 표시
+        result.messages.forEach(message => {
+            this.addCombatMessage(message);
+            this.addLogEntry(message);
+        });
+
+        this.updateCombatHP();
+        this.updateCharacterDisplay();
+
+        // 전투 종료 확인
+        if (result.battleEnd) {
+            setTimeout(() => {
+                if (result.winner === 'player') {
+                    this.character.experience += result.experience;
+                    this.addLogEntry(`전투에서 승리! ${result.experience} 경험치를 획득했습니다.`);
+                    this.checkLevelUp();
+                } else {
+                    this.addLogEntry('전투에서 패배했습니다...');
+                }
+                this.endCombat();
+            }, 2000);
+        }
+    }
+
+    // 전투 메시지 추가
+    addCombatMessage(message) {
+        const messagesContainer = document.getElementById('combat-messages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'combat-message';
+        messageDiv.textContent = message;
+
+        if (message.includes('데미지')) {
+            messageDiv.classList.add('damage');
+        } else if (message.includes('회복')) {
+            messageDiv.classList.add('heal');
+        } else if (message.includes('빗나갔') || message.includes('피했')) {
+            messageDiv.classList.add('miss');
+        } else if (message.includes('승리')) {
+            messageDiv.classList.add('victory');
+        } else if (message.includes('패배')) {
+            messageDiv.classList.add('defeat');
+        }
+
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // 전투 메시지 초기화
+    clearCombatMessages() {
+        const messagesContainer = document.getElementById('combat-messages');
+        messagesContainer.innerHTML = '';
+    }
+
+    // 전투에서 도망
+    fleeCombat() {
+        const escapeChance = Math.random();
+        if (escapeChance > 0.3) {
+            this.addCombatMessage('성공적으로 도망쳤습니다!');
+            this.addLogEntry(`${this.currentMonster.name}으로부터 도망쳤습니다.`);
+            setTimeout(() => this.endCombat(), 1000);
+        } else {
+            this.addCombatMessage('도망치지 못했습니다!');
+            // 몬스터 공격 받음
+            setTimeout(() => this.performCombatAction('defend'), 1000);
+        }
+    }
+
+    // 전투 종료
+    endCombat() {
+        this.inCombat = false;
+        this.currentMonster = null;
+        const combatArea = document.getElementById('combat-area');
+        combatArea.classList.add('hidden');
+    }
+
+    // 레벨업 확인
+    checkLevelUp() {
+        const expNeeded = this.character.level * 100;
+        if (this.character.experience >= expNeeded) {
+            this.character.level++;
+            this.character.experience -= expNeeded;
+            
+            // HP 증가
+            const hpIncrease = Math.floor(Math.random() * 8) + 3;
+            this.character.maxHp += hpIncrease;
+            this.character.currentHp = this.character.maxHp;
+            
+            this.addLogEntry(`🎉 레벨업! 레벨 ${this.character.level}이 되었습니다! HP가 ${hpIncrease} 증가했습니다.`);
+            this.updateCharacterDisplay();
+        }
+    }
+
+    // 휴식
+    restCharacter() {
+        if (this.inCombat) {
+            this.addLogEntry('전투 중에는 휴식할 수 없습니다!');
+            return;
+        }
+
+        const healAmount = Math.floor(this.character.maxHp * 0.5);
+        this.character.currentHp = Math.min(this.character.maxHp, this.character.currentHp + healAmount);
+        
+        this.addLogEntry(`😴 휴식을 취했습니다. HP가 ${healAmount} 회복되었습니다.`);
+        this.updateCharacterDisplay();
+    }
+
+    // 던전 탐험
+    exploreDungeon() {
+        if (this.inCombat) {
+            this.addLogEntry('전투 중에는 탐험할 수 없습니다!');
+            return;
+        }
+
+        const events = [
+            { type: 'monster', message: '어둠 속에서 무언가가 움직입니다...' },
+            { type: 'treasure', message: '반짝이는 보물상자를 발견했습니다!' },
+            { type: 'empty', message: '텅 빈 방을 발견했습니다.' },
+            { type: 'trap', message: '함정에 걸렸습니다!' }
+        ];
+
+        const randomEvent = events[Math.floor(Math.random() * events.length)];
+        this.addLogEntry(`🏰 ${randomEvent.message}`);
+
+        switch (randomEvent.type) {
+            case 'monster':
+                setTimeout(() => this.startEncounter(), 1000);
+                break;
+            case 'treasure':
+                const gold = Math.floor(Math.random() * 50) + 10;
+                this.addLogEntry(`💰 ${gold} 골드를 발견했습니다!`);
+                break;
+            case 'trap':
+                const damage = Math.floor(Math.random() * 5) + 1;
+                this.character.currentHp = Math.max(1, this.character.currentHp - damage);
+                this.addLogEntry(`💥 함정으로 ${damage}의 데미지를 받았습니다!`);
+                this.updateCharacterDisplay();
+                break;
+        }
     }
 
     // 능력치 수정자 계산 (D&D 방식)

@@ -16,7 +16,7 @@
         <div class="container">
             <!-- 캐릭터 생성 섹션 -->
             <section class="character-section">
-                <h2>캐릭터 생성</h2>
+                <h2>캐릭터 관리</h2>
                 <div class="character-creation">
                     <div class="character-info">
                         <label for="character-name">캐릭터 이름:</label>
@@ -24,26 +24,106 @@
                         
                         <label for="character-class">직업:</label>
                         <select id="character-class">
-                            <option value="전사">전사</option>
-                            <option value="마법사">마법사</option>
-                            <option value="도적">도적</option>
-                            <option value="성직자">성직자</option>
-                            <option value="궁수">궁수</option>
+                            <option value="전사">⚔️ 전사</option>
+                            <option value="마법사">🧙‍♂️ 마법사</option>
+                            <option value="도적">🗡️ 도적</option>
+                            <option value="성직자">⛪ 성직자</option>
+                            <option value="궁수">🏹 궁수</option>
                         </select>
                         
                         <button id="generate-stats">능력치 생성</button>
+                        
+                        <!-- 캐릭터 상태 표시 -->
+                        <div class="character-status">
+                            <h3>캐릭터 상태</h3>
+                            <div class="status-bars">
+                                <div class="status-bar">
+                                    <label>체력 (HP)</label>
+                                    <div class="hp-bar">
+                                        <div class="hp-fill" id="hp-fill"></div>
+                                        <span id="hp-text">0/0</span>
+                                    </div>
+                                </div>
+                                <div class="status-info">
+                                    <div>레벨: <span id="character-level">1</span></div>
+                                    <div>경험치: <span id="character-exp">0</span></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="stats-display">
                         <h3>능력치</h3>
                         <div id="character-stats">
-                            <div class="stat">힘: <span id="stat-힘">-</span></div>
-                            <div class="stat">민첩: <span id="stat-민첩">-</span></div>
-                            <div class="stat">지능: <span id="stat-지능">-</span></div>
-                            <div class="stat">체력: <span id="stat-체력">-</span></div>
-                            <div class="stat">매력: <span id="stat-매력">-</span></div>
-                            <div class="stat">지혜: <span id="stat-지혜">-</span></div>
+                            <div class="stat" data-stat="힘">힘: <span id="stat-힘">-</span> <small class="modifier" id="mod-힘">(+0)</small></div>
+                            <div class="stat" data-stat="민첩">민첩: <span id="stat-민첩">-</span> <small class="modifier" id="mod-민첩">(+0)</small></div>
+                            <div class="stat" data-stat="지능">지능: <span id="stat-지능">-</span> <small class="modifier" id="mod-지능">(+0)</small></div>
+                            <div class="stat" data-stat="체력">체력: <span id="stat-체력">-</span> <small class="modifier" id="mod-체력">(+0)</small></div>
+                            <div class="stat" data-stat="매력">매력: <span id="stat-매력">-</span> <small class="modifier" id="mod-매력">(+0)</small></div>
+                            <div class="stat" data-stat="지혜">지혜: <span id="stat-지혜">-</span> <small class="modifier" id="mod-지혜">(+0)</small></div>
                         </div>
+                        
+                        <!-- 캐릭터 아바타 -->
+                        <div class="character-avatar">
+                            <div id="character-icon">🧑‍💼</div>
+                            <div id="character-display-name">새로운 모험가</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 모험 및 전투 섹션 -->
+            <section class="adventure-section">
+                <h2>모험</h2>
+                <div class="adventure-controls">
+                    <button id="start-encounter" class="adventure-btn">🗡️ 몬스터 조우</button>
+                    <button id="rest-character" class="adventure-btn">😴 휴식</button>
+                    <button id="explore-dungeon" class="adventure-btn">🏰 던전 탐험</button>
+                </div>
+                
+                <!-- 전투 화면 -->
+                <div id="combat-area" class="combat-area hidden">
+                    <h3>⚔️ 전투</h3>
+                    <div class="combat-display">
+                        <div class="combatant player-side">
+                            <div class="combatant-avatar">
+                                <div id="player-combat-icon">🧑‍💼</div>
+                                <div id="player-combat-name">플레이어</div>
+                            </div>
+                            <div class="combatant-hp">
+                                <div class="hp-bar">
+                                    <div class="hp-fill" id="player-combat-hp"></div>
+                                    <span id="player-combat-hp-text">0/0</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="combat-vs">VS</div>
+                        
+                        <div class="combatant monster-side">
+                            <div class="combatant-avatar">
+                                <div id="monster-icon">👹</div>
+                                <div id="monster-name">몬스터</div>
+                            </div>
+                            <div class="combatant-hp">
+                                <div class="hp-bar">
+                                    <div class="hp-fill" id="monster-hp"></div>
+                                    <span id="monster-hp-text">0/0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="combat-actions">
+                        <button id="attack-btn" class="combat-btn">⚔️ 공격</button>
+                        <button id="defend-btn" class="combat-btn">🛡️ 방어</button>
+                        <button id="skill-btn" class="combat-btn">✨ 스킬</button>
+                        <button id="flee-btn" class="combat-btn">🏃‍♂️ 도망</button>
+                    </div>
+                    
+                    <div class="combat-log">
+                        <h4>전투 로그</h4>
+                        <div id="combat-messages"></div>
                     </div>
                 </div>
             </section>

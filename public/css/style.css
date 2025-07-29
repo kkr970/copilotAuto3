@@ -33,13 +33,17 @@ header p {
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 2rem auto;
     padding: 0 1rem;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto auto;
     gap: 2rem;
+}
+
+.adventure-section {
+    grid-column: 1 / -1;
 }
 
 .log-section {
@@ -341,4 +345,278 @@ footer {
     section {
         padding: 1.5rem;
     }
+}
+
+/* 캐릭터 상태 스타일 */
+.character-status {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #f0f8ff;
+    border-radius: 10px;
+    border: 2px solid #4299e1;
+}
+
+.status-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.status-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.hp-bar {
+    position: relative;
+    background: #e2e8f0;
+    height: 25px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid #4a5568;
+}
+
+.hp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #48bb78, #68d391);
+    transition: width 0.5s ease;
+    border-radius: 8px;
+}
+
+.hp-bar span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+    font-size: 0.9rem;
+}
+
+.status-info {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    color: #2d3748;
+}
+
+/* 캐릭터 아바타 스타일 */
+.character-avatar {
+    margin-top: 1.5rem;
+    text-align: center;
+    padding: 1rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 15px;
+    color: white;
+}
+
+#character-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+#character-display-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* 능력치 수정자 스타일 */
+.modifier {
+    color: #666;
+    font-weight: normal;
+}
+
+/* 모험 섹션 스타일 */
+.adventure-section {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.adventure-section h2 {
+    color: white;
+    border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+.adventure-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.adventure-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.adventure-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* 전투 화면 스타일 */
+.combat-area {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 2rem;
+    border-radius: 15px;
+    margin-top: 2rem;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.combat-area.hidden {
+    display: none;
+}
+
+.combat-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    gap: 2rem;
+}
+
+.combatant {
+    flex: 1;
+    text-align: center;
+}
+
+.combatant-avatar {
+    margin-bottom: 1rem;
+}
+
+.combatant-avatar div:first-child {
+    font-size: 4rem;
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.combatant-avatar div:last-child {
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.combatant-hp {
+    margin-top: 1rem;
+}
+
+.combat-vs {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ff6b6b;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.combat-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.combat-btn {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    color: white;
+    border: none;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.combat-btn:hover {
+    background: linear-gradient(135deg, #ee5a52, #dc3545);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(238, 90, 82, 0.4);
+}
+
+.combat-btn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.combat-log {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1.5rem;
+    border-radius: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.combat-log h4 {
+    margin-bottom: 1rem;
+    color: #ffd700;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+#combat-messages {
+    font-family: 'Courier New', monospace;
+    line-height: 1.5;
+}
+
+.combat-message {
+    padding: 0.3rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    animation: fadeIn 0.5s ease;
+}
+
+.combat-message:last-child {
+    border-bottom: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.combat-message.damage {
+    color: #ff6b6b;
+}
+
+.combat-message.heal {
+    color: #48bb78;
+}
+
+.combat-message.miss {
+    color: #ffd700;
+}
+
+.combat-message.victory {
+    color: #48bb78;
+    font-weight: bold;
+}
+
+.combat-message.defeat {
+    color: #ff6b6b;
+    font-weight: bold;
+}
+
+.hidden {
+    display: none;
 }
