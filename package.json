@@ -1,0 +1,17 @@
+{
+  "name": "simple-trpg",
+  "version": "1.0.0",
+  "description": "간단한 TRPG(테이블탑 롤플레잉 게임) 웹 애플리케이션",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["trpg", "dice", "rpg", "tabletop", "game"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

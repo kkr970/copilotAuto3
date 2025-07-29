@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>간단한 TRPG</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>🎲 간단한 TRPG 🎲</h1>
+        <p>테이블탑 롤플레잉 게임에 오신 것을 환영합니다!</p>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- 캐릭터 생성 섹션 -->
+            <section class="character-section">
+                <h2>캐릭터 생성</h2>
+                <div class="character-creation">
+                    <div class="character-info">
+                        <label for="character-name">캐릭터 이름:</label>
+                        <input type="text" id="character-name" placeholder="영웅의 이름을 입력하세요">
+                        
+                        <label for="character-class">직업:</label>
+                        <select id="character-class">
+                            <option value="전사">전사</option>
+                            <option value="마법사">마법사</option>
+                            <option value="도적">도적</option>
+                            <option value="성직자">성직자</option>
+                            <option value="궁수">궁수</option>
+                        </select>
+                        
+                        <button id="generate-stats">능력치 생성</button>
+                    </div>
+                    
+                    <div class="stats-display">
+                        <h3>능력치</h3>
+                        <div id="character-stats">
+                            <div class="stat">힘: <span id="stat-힘">-</span></div>
+                            <div class="stat">민첩: <span id="stat-민첩">-</span></div>
+                            <div class="stat">지능: <span id="stat-지능">-</span></div>
+                            <div class="stat">체력: <span id="stat-체력">-</span></div>
+                            <div class="stat">매력: <span id="stat-매력">-</span></div>
+                            <div class="stat">지혜: <span id="stat-지혜">-</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 주사위 굴리기 섹션 -->
+            <section class="dice-section">
+                <h2>주사위 굴리기</h2>
+                <div class="dice-controls">
+                    <div class="dice-input">
+                        <label for="dice-count">주사위 개수:</label>
+                        <input type="number" id="dice-count" value="1" min="1" max="10">
+                        
+                        <label for="dice-sides">면 수:</label>
+                        <select id="dice-sides">
+                            <option value="4">d4</option>
+                            <option value="6" selected>d6</option>
+                            <option value="8">d8</option>
+                            <option value="10">d10</option>
+                            <option value="12">d12</option>
+                            <option value="20">d20</option>
+                            <option value="100">d100</option>
+                        </select>
+                        
+                        <button id="roll-dice">굴리기!</button>
+                    </div>
+                    
+                    <div class="quick-rolls">
+                        <h3>빠른 굴리기</h3>
+                        <button class="quick-roll" data-sides="20">d20</button>
+                        <button class="quick-roll" data-sides="6">d6</button>
+                        <button class="quick-roll" data-sides="4">d4</button>
+                    </div>
+                </div>
+                
+                <div class="dice-results">
+                    <h3>결과</h3>
+                    <div id="roll-results"></div>
+                </div>
+            </section>
+
+            <!-- 게임 로그 섹션 -->
+            <section class="log-section">
+                <h2>게임 로그</h2>
+                <div id="game-log"></div>
+                <button id="clear-log">로그 지우기</button>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>즐거운 모험 되세요! 🗡️⚔️🛡️</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
